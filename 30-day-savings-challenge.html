@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>30-Day Savings Challenge</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Source+Serif+4:wght@300;400&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Source Serif 4', serif; background: #fff; color: #1a1a1a; }
+  .page { max-width: 800px; margin: 0 auto; padding: 50px 60px; }
+  .cover-strip { background: #0f1923; color: #fff; padding: 36px 60px; max-width: 800px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+  .cover-strip h1 { font-family: 'Playfair Display', serif; font-size: 36px; }
+  .cover-strip h1 span { color: #b8966e; }
+  .cover-strip p { color: #aaa; font-size: 13px; margin-top: 4px; }
+  .cover-strip .goal-box { text-align: right; }
+  .cover-strip .goal-box label { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: #666; display: block; }
+  .cover-strip .goal-box .goal-amount { font-family: 'Playfair Display', serif; font-size: 28px; color: #b8966e; }
+  .intro { padding: 28px 60px; max-width: 800px; margin: 0 auto; background: #faf8f5; border-bottom: 1px solid #e0d8cc; display: flex; gap: 40px; }
+  .intro-item { flex: 1; }
+  .intro-item label { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: #999; display: block; margin-bottom: 4px; }
+  .intro-item p { font-size: 14px; color: #333; }
+  .grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 28px; }
+  .day-card { border: 1px solid #e0d8cc; border-radius: 6px; padding: 12px 10px; text-align: center; transition: background 0.2s; }
+  .day-card.completed { background: #0f1923; border-color: #0f1923; }
+  .day-card.completed .day-num { color: #b8966e; }
+  .day-card.completed .day-amount { color: #fff; }
+  .day-card.completed .check { opacity: 1; }
+  .day-num { font-size: 10px; letter-spacing: 2px; color: #bbb; text-transform: uppercase; }
+  .day-amount { font-family: 'Playfair Display', serif; font-size: 18px; color: #0f1923; margin: 4px 0; }
+  .check { font-size: 18px; opacity: 0.15; cursor: pointer; user-select: none; }
+  .progress-section { margin-top: 30px; border: 1px solid #e0d8cc; border-radius: 6px; padding: 20px; }
+  .progress-header { display: flex; justify-content: space-between; margin-bottom: 12px; }
+  .progress-header span { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: #999; }
+  .progress-bar-bg { background: #f0ece4; border-radius: 999px; height: 10px; overflow: hidden; }
+  .progress-bar-fill { background: linear-gradient(90deg, #0f1923, #b8966e); height: 100%; width: 0%; border-radius: 999px; transition: width 0.4s ease; }
+  .totals-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 20px; }
+  .total-box { background: #faf8f5; border-radius: 6px; padding: 14px; text-align: center; }
+  .total-box label { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: #999; display: block; margin-bottom: 4px; }
+  .total-box .val { font-family: 'Playfair Display', serif; font-size: 22px; color: #0f1923; }
+  .total-box .val.gold { color: #b8966e; }
+  .tips { margin-top: 28px; }
+  .tips h3 { font-family: 'Playfair Display', serif; font-size: 18px; margin-bottom: 14px; }
+  .tip { display: flex; gap: 12px; margin-bottom: 12px; align-items: flex-start; }
+  .tip-icon { width: 28px; height: 28px; background: #0f1923; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0; }
+  .tip p { font-size: 14px; color: #444; line-height: 1.6; }
+  .footer { margin-top: 30px; padding-top: 16px; border-top: 1px solid #e0d8cc; display: flex; justify-content: space-between; font-size: 11px; color: #999; }
+</style>
+</head>
+<body>
+
+<div class="cover-strip">
+  <div>
+    <h1>30-Day Savings<br><span>Challenge</span></h1>
+    <p>Build the habit. Build the wealth.</p>
+  </div>
+  <div class="goal-box">
+    <label>Total You'll Save</label>
+    <div class="goal-amount" id="total-display">$465</div>
+  </div>
+</div>
+
+<div class="intro">
+  <div class="intro-item">
+    <label>How it works</label>
+    <p>Save a small amount each day. Check it off. Watch your savings grow — and your habit stick.</p>
+  </div>
+  <div class="intro-item">
+    <label>Start Date</label>
+    <p id="start-date-display">—</p>
+  </div>
+  <div class="intro-item">
+    <label>Goal</label>
+    <p>Complete all 30 days & save $465</p>
+  </div>
+</div>
+
+<div class="page">
+  <div class="grid" id="challenge-grid"></div>
+
+  <div class="progress-section" style="margin-top:28px;">
+    <div class="progress-header">
+      <span>Your Progress</span>
+      <span id="progress-label">0 / 30 days</span>
+    </div>
+    <div class="progress-bar-bg">
+      <div class="progress-bar-fill" id="progress-fill"></div>
+    </div>
+    <div class="totals-grid">
+      <div class="total-box">
+        <label>Days Done</label>
+        <div class="val" id="days-done">0</div>
+      </div>
+      <div class="total-box">
+        <label>Saved So Far</label>
+        <div class="val gold" id="saved-so-far">$0</div>
+      </div>
+      <div class="total-box">
+        <label>Remaining</label>
+        <div class="val" id="remaining">$465</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tips">
+    <h3>Tips for Success</h3>
+    <div class="tip">
+      <div class="tip-icon">💰</div>
+      <p><strong>Move money the same day you check it off.</strong> Transfer it to a separate savings account immediately so it doesn't get spent.</p>
+    </div>
+    <div class="tip">
+      <div class="tip-icon">📅</div>
+      <p><strong>Set a daily reminder.</strong> Even 60 seconds of intentional saving per day rewires how you think about money.</p>
+    </div>
+    <div class="tip">
+      <div class="tip-icon">🔁</div>
+      <p><strong>Missed a day?</strong> Don't quit — just double up the next day. Progress over perfection always wins.</p>
+    </div>
+    <div class="tip">
+      <div class="tip-icon">🎯</div>
+      <p><strong>Name your goal.</strong> Write what you're saving toward below. A named goal is 2x more likely to be achieved.</p>
+    </div>
+  </div>
+
+  <div style="margin-top:24px; border:1px solid #e0d8cc; border-radius:6px; padding:16px;">
+    <label style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#999;display:block;margin-bottom:8px;">I'm Saving For:</label>
+    <input style="border:none;border-bottom:1px solid #e0d8cc;width:100%;font-family:'Playfair Display',serif;font-size:22px;color:#0f1923;padding:4px 0;" placeholder="e.g. Emergency fund, vacation, debt payoff...">
+  </div>
+
+  <div class="footer">
+    <span>The Budget Blueprint — 30-Day Challenge Planner</span>
+    <span>Click days to mark complete</span>
+  </div>
+</div>
+
+<script>
+  // Savings amounts for 30 days (roughly escalating, total = $465)
+  const amounts = [5,5,10,10,10,15,15,15,20,20,10,10,15,15,20,20,10,10,15,15,20,20,10,15,15,20,20,15,15,20];
+  const total = amounts.reduce((a,b)=>a+b,0);
+  document.getElementById('total-display').textContent = '$' + total;
+  document.getElementById('remaining').textContent = '$' + total;
+
+  // Set start date
+  const today = new Date();
+  document.getElementById('start-date-display').textContent = today.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
+
+  const grid = document.getElementById('challenge-grid');
+  let completed = new Set();
+
+  amounts.forEach((amt, i) => {
+    const card = document.createElement('div');
+    card.className = 'day-card';
+    card.innerHTML = `<div class="day-num">Day ${i+1}</div><div class="day-amount">$${amt}</div><div class="check">✓</div>`;
+    card.addEventListener('click', () => {
+      if (completed.has(i)) { completed.delete(i); card.classList.remove('completed'); }
+      else { completed.add(i); card.classList.add('completed'); }
+      updateStats();
+    });
+    grid.appendChild(card);
+  });
+
+  function updateStats() {
+    const done = completed.size;
+    const saved = [...completed].reduce((sum, i) => sum + amounts[i], 0);
+    const pct = Math.round((done/30)*100);
+    document.getElementById('days-done').textContent = done;
+    document.getElementById('saved-so-far').textContent = '$' + saved;
+    document.getElementById('remaining').textContent = '$' + (total - saved);
+    document.getElementById('progress-label').textContent = `${done} / 30 days`;
+    document.getElementById('progress-fill').style.width = pct + '%';
+  }
+</script>
+</body>
+</html>
